@@ -1,8 +1,8 @@
 Functional Requirement,User Story / Acceptance criteria,Component / API,Future test
 FR-01,US-01 / AC-01.1; AC-01.2,POST /issues,test_create_request_success; test_create_request_validation_error
 FR-02,US-02 / AC-02.1; AC-02.2,GET /issues; GET /issues/{id},test_get_requests_with_filters; test_get_requests_empty
-FR-03,US-03 / AC-03.1,PATCH /issues/{id},test_atomic_update_failure_rolls_back_changes
-FR-04,US-04 / AC-04.1; AC-04.2,PATCH /issues/{id}/status,test_update_status_success; test_update_status_forbidden_for_non_assignee
+FR-03,US-03 / AC-03.1; AC-03.2; AC-03.3,PATCH /issues/{id},test_atomic_update_failure; test_update_closed_issue_conflict; test_partial_update_success
+FR-04,US-04 / AC-04.1; AC-04.2,PATCH /issues/{id}/status,test_update_status_success; test_update_status_conflict_when_no_assignee
 FR-05,US-05 / AC-05.1; AC-05.2,PATCH /issues/{id},test_assign_request_by_manager; test_assign_request_forbidden_for_translator
 FR-06,US-06 / AC-06.1; AC-06.2,POST /issues/{id}/comments; GET /issues/{id}/comments,test_add_comment_success; test_add_comment_empty_text
 FR-07,US-07 / AC-07.1,Database Config / Models,test_data_persists_after_server_restart
