@@ -18,6 +18,11 @@
     "timestamp": "2026-10-18T12:00:00Z"
   }
   ```
+  - **Помилки:**
+    - `401 Unauthorized` (Відсутній або недійсний заголовок X-User-Id):
+    ```json
+    { "detail": "Unauthorized: X-User-Id header missing or invalid" }
+    ```
 
 ### 1.2 Отримання списку користувачів
 
@@ -31,6 +36,11 @@
     { "id": 3, "name": "Team Lead", "role": "Manager" }
   ]
   ```
+- **Помилки:**
+    - `401 Unauthorized` (Відсутній або недійсний заголовок X-User-Id):
+    ```json
+    { "detail": "Unauthorized: X-User-Id header missing or invalid" }
+    ```
 
 ---
 
@@ -82,13 +92,30 @@
   - `status` (опціонально, напр. `OPEN`)
   - `priority` (опціонально, напр. `High`, або `null` для Not Set)
 - **Успішна відповідь (200 OK):** Масив об'єктів заявок (як у 2.1). Якщо збігів немає — повертається порожній масив `[]`.
+- **Помилки:**
+  - `422 Unprocessable Entity` (Передано невідомий статус або пріоритет у Query-параметрах):
+    ```json
+    {
+      "detail": [
+        {
+          "loc": ["query", "status"],
+          "msg": "Input should be 'OPEN', 'IN_PROGRESS', 'RESOLVED' or 'CLOSED'",
+          "type": "enum"
+        }
+      ]
+    }
+    ```
 
 ### 2.3 Отримання однієї заявки
 
 - **Метод і шлях:** `GET /issues/{id}`
 - **Призначення:** Повернути деталі конкретної заявки.
 - **Успішна відповідь (200 OK):** Об'єкт заявки.
-- **Помилки:** `404 Not Found` (Заявку не знайдено).
+- **Помилки:**
+  - `404 Not Found` (Заявку не знайдено):
+    ```json
+    { "detail": "Translation request with id 999 not found" }
+    ```
 
 ### 2.4 Часткове оновлення даних заявки (PATCH)
 
@@ -107,10 +134,30 @@
   ```
 - **Успішна відповідь (200 OK):** Об'єкт оновленої заявки.
 - **Помилки:**
-  - `404 Not Found` (Заявку не знайдено).
-  - `409 Conflict` (Заявка у статусі `CLOSED`).
-  - `403 Forbidden` (Спроба змінити `priority` або `assignee_id` користувачем без ролі `Manager`).
-  - `422 Unprocessable Entity` (Передано некоректні дані, наприклад, невідомий `assignee_id`).
+  - `404 Not Found` (Заявку не знайдено):
+    ```json
+    { "detail": "Translation request with id 999 not found" }
+    ```
+  - `409 Conflict` (Спроба редагувати заявку у статусі CLOSED):
+    ```json
+    { "detail": "Cannot update a request in CLOSED status" }
+    ```
+  - `403 Forbidden` (Спроба змінити priority/assignee_id користувачем без ролі Manager):
+    ```json
+    { "detail": "Only Manager can change priority or assignee" }
+    ```
+  - `422 Unprocessable Entity` (Передано невідомий assignee_id):
+    ```json
+    {
+      "detail": [
+        {
+          "loc": ["body", "assignee_id"],
+          "msg": "Translator with id 99 does not exist",
+          "type": "value_error"
+        }
+      ]
+    }
+    ```
 
 ### 2.5 Окрема операція зміни статусу
 
@@ -125,9 +172,26 @@
 - **Успішна відповідь (200 OK):**
   Об'єкт оновленої заявки. (Якщо передано поточний статус, відповідь також `200 OK` без фактичних змін у базі).
 - **Помилки:**
-  - `404 Not Found` (Заявку не знайдено).
-  - `409 Conflict` (Заборонений перехід статусу, АБО спроба змінити статус закритої заявки, АБО користувач не є поточним `Assignee`).
-  - `422 Unprocessable Entity` (Передано невідомий статус, наприклад "UNKNOWN", або значення null).
+  - `404 Not Found` (Заявку не знайдено):
+    ```json
+    { "detail": "Translation request with id 999 not found" }
+    ```
+  - `409 Conflict` (Заборонений перехід статусу АБО діє не поточний Assignee):
+    ```json
+    { "detail": "Invalid status transition from OPEN to RESOLVED" }
+    ```
+  - `422 Unprocessable Entity` (Передано невідомий статус або null):
+    ```json
+    {
+      "detail": [
+        {
+          "loc": ["body", "status"],
+          "msg": "Input should be 'OPEN', 'IN_PROGRESS', 'RESOLVED' or 'CLOSED'",
+          "type": "enum"
+        }
+      ]
+    }
+    ```
 
 ---
 
@@ -149,7 +213,11 @@
     }
   ]
   ```
-- **Помилки:** `404 Not Found` (Якщо самої заявки не існує).
+- **Помилки:**
+  - `404 Not Found` (Якщо самої заявки не існує):
+    ```json
+    { "detail": "Translation request with id 999 not found" }
+    ```
 
 ### 3.2 Додавання коментаря
 
@@ -163,5 +231,19 @@
   ```
 - **Успішна відповідь (201 Created):** Об'єкт новоствореного коментаря (як у 3.1).
 - **Помилки:**
-  - `404 Not Found` (Заявки не існує).
-  - `422 Unprocessable Entity` (Порожній текст коментаря).
+  - `404 Not Found` (Заявки не існує):
+    ```json
+    { "detail": "Translation request with id 999 not found" }
+    ```
+  - `422 Unprocessable Entity` (Текст коментаря порожній або містить лише пробіли):
+    ```json
+    {
+      "detail": [
+        {
+          "loc": ["body", "text"],
+          "msg": "String should have at least 1 character",
+          "type": "string_too_short"
+        }
+      ]
+    }
+    ```
