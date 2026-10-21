@@ -1,0 +1,223 @@
+﻿0. Початковий запит замовника — Customer Request
+Невеликому бюро перекладів потрібна система для обліку запитів на переклад текстів. Користувач створює заявку з назвою й описом (текст або посилання). Команда переглядає запити, призначає перекладача, визначає пріоритет, змінює статус і додає коментарі. Хотілося б швидко бачити важливі відкриті запити. У майбутньому система має допомагати автоматично визначати тематику та пріоритет звернення.
+1. Discovery / Problem Analysis
+Вхід:
+Customer Request
+Вихід:
+Problem Statement + Product Goals + Stakeholders + Primary Users + Known Constraints + Assumptions + Open Questions
+Problem Statement
+Команді бюро складно централізовано фіксувати, відстежувати та пріоритизувати замовлення на переклад від клієнтів.
+Product Business goal
+Скоротити час від реєстрації запиту на переклад до його призначення перекладачу та виконання.
+Stakeholders (зацікавлені особи)
+Primary:
+• Translator (Team Member) 
+• Manager (Team Lead) 
+Secondary:
+• Product Owner / замовник 
+• System Administrator 
+Secondary stakeholders мають інтерес до результатів або належної роботи системи, але не є основними користувачами та не беруть безпосередньої участі в основних сценаріях використання MVP. 
+Primary users:
+• Translator (Team Member) 
+• Manager (Team Lead) 
+Constraints
+• КС-01. Система призначена для невеликої внутрішньої команди бюро. 
+• КС-02. Перший реліз має бути простим і швидким у розробці. 
+• КС-03. Система повинна працювати як web application. 
+• КС-04. Користувачами є лише члени команди, а не зовнішні клієнти. 
+• КС-05. У першій версії не планується інтеграція з іншими зовнішніми трекерами чи CRM. 
+• КС-06. AI-функціональність не є обов'язковою для першого релізу. 
+• КС-07. Рішення має бути придатним для подальшого розширення AI-функціональністю. 
+Assumptions
+• А-01. Припускаємо, що всі користувачі системи є членами однієї команди. 
+• А-02. Припускаємо, що кількість користувачів невелика, наприклад до кількох десятків. 
+• А-03. Припускаємо, що одночасно працюватиме невелика кількість користувачів. 
+• А-04. Припускаємо, що для виконання перекладу достатньо одного відповідального виконавця. 
+• А-05. Припускаємо, що запит на переклад має один поточний priority. 
+• А-06. Припускаємо, що comments достатньо для робочого обговорення запиту. 
+• А-07. Припускаємо, що мобільний застосунок для першої версії не потрібний. 
+• А-08. Припускаємо, що AI-функції будуть рекомендаційними, а не автоматично змінюватимуть category або priority. 
+• А-09. Припускаємо, що існуючих даних для навчання AI-моделі може бути недостатньо. 
+Open Questions та відповіді
+• Чи потрібна автентифікація? Так. В системі є 3 заздалегідь задані члени команди (2 Translator та 1 Manager). 
+• Хто може створювати запит? Будь-який автентифікований член команди може створити запит на переклад. 
+• Хто може змінювати пріоритет? Manager (Team Lead) може змінювати priority. 
+• Які є приорітети? Low, Normal, High, Critical. 
+• Який пріоритет отримує запит на переклад під час створення? Значення не встановлене. 
+• Які статуси? Open, In Progress, Resolved, Closed. 
+• Хто може призначати виконавця на запит? Manager (Team Lead). 
+• Чи можна видаляти запит? Ні. 
+• Що означає «важливі»? Priority = High or Critical. 
+• Чи потрібна історія змін? Ні. 
+2. Product Vision + Initial Product Scope
+Вхід: Problem Statement + Product Goals + Stakeholders + Primary Users + Constraints + Assumptions + Open Questions 
+Вихід: Product Vision + Initial Product Scope + Initial Product Capabilities 
+Product Vision: VerbaDesk - Внутрішня вебсистема для невеликого бюро перекладів, призначена для реєстрації, відстеження та координації виконання запитів на переклад. 
+Initial Product Scope
+• ведення та відстеження запитів протягом їх життєвого циклу; 
+• організація відповідальності та пріоритетності роботи над запитами; 
+• командна взаємодія навколо запитів; 
+• допомога у визначенні запитів, що потребують першочергової уваги; 
+• інтелектуальна підтримка: автоматичні рекомендації щодо тематики та пріоритету запиту. 
+Out of Scope на поточному етапі: Customer support portal, Billing, Continuous Integration / Continuous Delivery, Time tracking, Full project management, Mobile application, etc. 
+Initial Product Capabilities
+• C-01 Request Registration & Repository: Реєструвати запити на переклад та зберігати їх у єдиному місці для подальшого перегляду. 
+• C-02 Request Lifecycle Tracking: Відстежувати стан перекладу протягом його життєвого циклу. 
+• C-03 Work Assignment & Prioritization: Визначати відповідального перекладача та відносну важливість запитів. 
+• C-04 Team Collaboration: Підтримувати командну взаємодію навколо конкретного перекладу. 
+• C-05 Request Triage & Focus: Допомагати команді швидко визначати запити, що потребують першочергової уваги. 
+• C-06 AI-assisted Triage: Допомагати автоматично класифікувати тексти та рекомендувати їхній пріоритет. 
+3. Stakeholder Needs & Stakeholder Requirements
+Вхід: Problem Statement + Stakeholders + Primary Users + Product Vision + Initial Product Scope + Initial Product Capabilities + Constraints + Assumptions + Open Questions 
+Вихід: Stakeholder Needs (-> Stakeholder Requirements) + Business Rules known at this level + Stakeholder Constraints + Refined Product Scope + Remaining Open Questions 
+• SR-01 - Register request. Член команди повинен мати можливість зареєструвати запит на переклад. 
+• SR-02 - View requests. Член команди повинен мати можливість переглядати зареєстровані запити. 
+• SR-03 - Assign responsibility. Команда повинна мати можливість визначити перекладача, відповідального за виконання запита. 
+• SR-04 - Prioritize requests. Команда повинна мати можливість визначити відносну важливість запиту. У разі неоднозначностей чи конфліктів вирішує Manager (Team Lead). 
+• SR-05 - Track progress. Члени команди повинні бачити поточний стан роботи над перекладом. 
+• SR-06 - Discuss request. Члени команди повинні мати можливість обговорювати робочі моменти в контексті відповідного запита. 
+• SR-07 - Change request status. Відповідальний за виконання запиту перекладач повинен мати можливість змінювати статус цього запиту. 
+• SR-08 - Identify important requests. Команда повинна мати можливість швидко знаходити важливі невиконані запити. 
+• SR-09 - Attachments for requests. Член команди повинен мати можливість прикріплювати файли до запиту (словники, додаткові матеріали). 
+• SR-10 - Automatic request categorization. Система повинна допомагати користувачу визначати тематику/категорію тексту. 
+• SR-11 - Automatic Priority recommendation. Система повинна допомагати користувачу визначати пріоритет звернення. 
+Business Rules
+• BR-01 - Authorized users: Системою можуть користуватися лише автентифіковані члени команди. У першій версії система має трьох заздалегідь визначених користувачів: двох Translator (Team Member) та одного Manager (Team Lead). 
+• BR-02 - Request creation: Будь-який автентифікований член команди може створити запит на переклад. 
+• BR-03 - Initial request status: Під час створення нового запиту система автоматично встановлює: status = Open. 
+• BR-04 - Initial request priority: Під час створення нової запиту її priority не визначений: priority = Not Set. 
+• BR-05 - Allowed priority values: Після встановлення priority воно повинно мати одне з таких значень: Low, Normal, High, Critical. До встановлення priority допускається стан «Не встановлено» (пусте значення). 
+• BR-06 - Priority management: Встановлювати та змінювати priority запиту може тільки Manager (Team Lead). 
+• BR-07 - Allowed status values: Status запиту може мати одне з таких значень: Open, In Progress, Resolved, Closed. 
+• BR-08 - Request status management: Член команди, відповідальний за виконання запиту, повинен мати можливість змінювати її status. 
+o BR-08.1 - Status transitions: Open -> In Progress, In Progress -> Resolved, Resolved -> Closed та Resolved -> In Progress для повторного відкриття роботи, Open -> Closed для змоги закрити запит при скасуванні клієнтом до початку обробки запиту. Інші переходи не дозволені. 
+• BR-09 - Important request: Запит вважається важливою, якщо її priority має значення: High або Critical. 
+o BR-09.1: Запит зі статусом Resolved вважається вирішеною, але ще не закритою. До переходу в Closed така запит залишається активною та може відображатися серед Important Requests відповідно до її priority. 
+• BR-10 - Request deletion: Запити не видаляються із системи. 
+• BR-11 - Change history: У першій версії системи окрема користувацька історія змін не передбачається. 
+• BR-12 - AI recommendations: AI-функціональність має рекомендаційний характер: система може рекомендувати категорію та priority, але не повинна автоматично змінювати ці значення без дії користувача. 
+4. Prioritization of Needs + Candidate MVP
+Вхід: Product Goals + Refined Product Scope + Stakeholder Requirements + Business Value + Dependencies + Risks + Constraints + Rough technical estimates 
+Вихід: Prioritized Stakeholder Requirements + Candidate MVP + Deferred Requirements + Future Requirements + Prioritization Rationale 
+Prioritized Stakeholder Requirements
+RequirementPriorityRough EffortSR-01 Register requestMustSmallSR-02 View requestsMustSmallSR-03 Assign responsibilityMustSmallSR-04 Prioritize requestsMustSmallSR-05 Track progressMustSmallSR-06 Discuss requestShouldMediumSR-07 Update Request StatusMustSmallSR-08 Identify important requestsShouldSmallSR-09 Attachments for requestsShouldLargeSR-10 Automatic request categorizationWon't for nowLarge / uncertainSR-11 Automatic priority recommendationWon't for nowLarge / uncertainCandidate MVP: Must+Should (ті з Should, що плануємо дозволити собі): з SR-01 по SR-08. 
+Future / Deferred Requirements: US-09, SR-10 та SR-11. 
+5. Detailed Functional Requirements Specification / User Stories + Acceptance Criteria
+Вхід: Prioritized Stakeholder requirements + Candidate MVP + Known Constraints + Relevant Assumptions Open Questions + Primary Users 
+Вихід: Detailed FR або User Stories + Acceptance Criteria 
+User Stories
+Epic 1 - Translation Request Management Як команда бюро, ми хочемо реєструвати та відстежувати запити на переклад текстів. 
+Story US-01 - Create Request 
+As a translator / manager 
+I want to create a request with a title and description 
+So that a translation task is recorded and can be tracked. 
+• AC-01.1 Користувач може ввести: Title, Description. 
+• AC-01.2 Title є обов'язковим. 
+• AC-01.3 Description є обов'язковим. 
+• AC-01.4 Після створення запит отримує: ID, status = Open, created_at, author. 
+• AC-01.5 Після створення запиту його priority не встановлено. 
+Сценарій для АС-01 (Gherkin): 
+Given 
+the user is authenticated And 
+the user is on the "New Request" page 
+When the user enters the title "Translation of Contract" And 
+enters the description "Translate to EN" And clicks "Create" 
+Then a new request should be created And 
+the request status should be "Open" And 
+the request should have a unique ID And 
+the request should contain the current user as its author 
+Сценарій для АС-02: 
+Given 
+the user is creating a new request 
+When the user leaves the title empty And 
+clicks "Create" 
+Then the request should not be created And 
+the system should display "Title is required" 
+Story US-02 - View Requests 
+As a team member, 
+I want to view registered requests, 
+so that I can see which texts have been requested and inspect their current details. 
+• AC-02.1 View request list: Авторизований член команди може переглянути список зареєстрованих заявок. 
+• AC-02.2 Request information in the list: Для кожного запиту у списку відображаються щонайменше: ID; Title; Status; Priority; Assignee, якщо він призначений. 
+• AC-02.3 View request details: Користувач може вибрати заявку зі списку та відкрити сторінку її деталей. 
+• AC-02.4 Request details: На сторінці відображаються: ID, Title, Description, Status, Priority, Assignee (якщо призначений), Author, Created at. 
+• AC-02.5 Empty list: Якщо зареєстрованих заявок немає, система відображає порожній список або повідомлення про відсутність. 
+Story US-03 - Assign Request to the responsible team member 
+Як Manager (Team Lead), 
+я хочу призначити заявку члену команди, 
+щоб було зрозуміло, хто відповідає за її виконання. 
+Acceptance Criteria 03: 
+• можна вибрати одного assignee; 
+• assignee повинен бути членом команди; 
+• призначати заявку може лише Manager (Team Lead); 
+• поточний assignee відображається у заявці. 
+Story US-04 - Set Request Priority 
+Як Manager (Team Lead), 
+я хочу встановлювати пріоритет запиту, 
+щоб команда могла визначити порядок роботи. 
+• АС-04.1 Допустимі значення встановленого Priority: Low, Normal, High, Critical. 
+• АС-04.2 Встановлювати та змінювати priority може лише Manager (Team Lead). 
+Story US-05 - Track Request Progress 
+As a team member, 
+I want to see the current status of an request, 
+so that I can understand the current progress of work on the translation. 
+• АС-05.1 Поточний status відображається для кожного запиту. 
+• AC-05.2 Status відображається на сторінці запиту. 
+• AC-05.3 Status відображається у списку. 
+Story US-06 - Add Comment 
+Як член команди, 
+я хочу додавати коментарі до запиту, 
+щоб обговорювати робочі моменти. 
+• AC-06.1 Comment text cannot be empty. 
+• AC-06.2 Added comment is stored and shown for the request. 
+• AC-06.3 Comment author is stored and displayed. 
+• AC-06.4 Creation date/time is stored and displayed. 
+• AC-06.5 Failed save does not create a comment and produces an error. 
+US-07 - Update Request Status 
+Як член команди, відповідальний за заявку, 
+я хочу змінювати статус запиту, 
+щоб команда бачила поточний стан роботи над перекладом. 
+• АС-07.1 Нова запит створюється зі статусом Open. 
+• АС-07.2 Допустимі статуси: Open, In Progress, Resolved, Closed. 
+• АС-07.3 Після зміни статусу система зберігає нове значення та відображає його при наступному перегляді. 
+• АС-07.4 Користувач, який не є виконавцем запиту, не може змінити її статус. 
+• АС-07.5 Система не дозволяє встановити значення статусу, якого немає у визначеному переліку. 
+Story US-08 - View Important Open Requests 
+Як член команди, 
+я хочу швидко бачити важливі відкриті запити, 
+щоб зосередитися на перекладах, які потребують першочергової уваги. 
+• AC-08.1 Запит з priority = High і статусом, відмінним від Closed, відображається у списку Important Requests. 
+• AC-08.2 Запит з priority = Critical і статусом, відмінним від Closed, відображається у списку Important Requests. 
+• AC-08.3 Запити з priority = Low або Normal не відображаються у списку Important Requests. 
+• AC-08.4 Запити зі status = Closed не відображаються незалежно від priority. 
+Story US-09 - Attach files to an request (DEFERRED)
+• AC-09.1 - AC-09.6 (Вимоги до сховища, лімітів розміру, сканування антивірусом та цілісності відкладені до майбутніх релізів). 
+Dependencies: 
+US-08 (View Important Open Requests) -> US-04 (Set Request Priority), US-07 (Update Request Status). 
+6. Quality Attributes + Security Requirements
+Вхід: Functional requirements + Business constraints 
+Вихід: Non-functional Quality / Security Requirements 
+• NFR-01 Response time < 1 s. 
+• NFR-02 Authentication required. 
+• NFR-03 HTTPS only. 
+• NFR-04 Backup of all data + attachments. 
+7. Feasibility, Estimation & Risk Assessment
+Вхід: Candidate MVP + Detailed FR + NFR + Business Rules + Constraints + Relevant Assumptions + Known dependencies 
+Вихід: Rough Effort Assessment + Key Risks + Technical Feasibility Assessment + Recommended Scope Adjustments 
+Попередня оцінка показала, що вимоги US-01-US-08 можуть бути реалізовані в межах першого релізу без складної додаткової інфраструктури. US-09 Attach files to an request має значно вищу складність, оскільки потребує: file storage; file size limits; malware scanning; backup. Основні ризики: 
+• R-01: спосіб реалізації authentication потребує уточнення; 
+• R-02: для майбутніх AI-функцій може бути недостатньо навчальних даних; 
+• R-03: реалізація attachments суттєво збільшує складність першого релізу. 
+Technical feasibility: реалізація US-01-US-08 оцінюється як технічно здійсненна для невеликої web application. Recommended scope adjustment: перенести US-09 Attach files to an request за межі першого релізу. 
+8. MVP / Release Scope
+Release MVP: US-01..US-08. 
+Deferred: US-09. 
+Future: SR-10, SR-11. 
+Updated NFRS:
+• NFR-01 Response time < 1 s 
+• NFR-02 Authentication required 
+• NFR-03 HTTPS only 
+• NFR-04 Backup of all data 
+9. UX/UI & Interaction Design
+(Цей розділ буде наповнюватися макетами та прототипами під час виконання практичної роботи)
+
